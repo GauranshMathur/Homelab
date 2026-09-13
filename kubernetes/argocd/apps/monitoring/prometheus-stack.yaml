@@ -21,7 +21,7 @@ spec:
       targetRevision: main
       path: helm/monitoring
       directory:
-        include: "alertmanager-config-secret.yaml"
+        include: "{alertmanager-config-secret.yaml,velero-alerts.yaml}"
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
