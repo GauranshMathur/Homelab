@@ -1,0 +1,52 @@
+# Velero backup alerting (KAN-32). GitOps-managed via the kube-prometheus-stack
+# Application's directory.include. All rules are severity: critical, the label the
+# Discord route matches.
+#
+# Metric notes (verified against Velero v1.16.1 source and live scrapes):
+# - velero_backup_last_status is 1 for Completed and 0 for Failed, PartiallyFailed and
+#   FailedValidation. PartiallyFailed is the KAN-67 failure mode that read "green" for
+#   195 days, so a plain == 0 catches it.
+# - last_status resets to 1 on server start, and a backup marked Failed after a crash
+#   never updates it. An OOM mid-backup is therefore caught by VeleroBackupStale (the
+#   timestamp survives restarts) and the existing PodCrashLooping, not by VeleroBackupFailed.
+# - Velero is scraped by Grafana Alloy through the prometheus.io pod annotations
+#   (job="prometheus.scrape.kubernetes_pods"). No ServiceMonitor exists or is needed.
+# - A repository-maintenance failure rule is added after the 1.18 upgrade (KAN-65);
+#   1.16.1 exposes no maintenance metrics.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: velero-alerts
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: velero
+      rules:
+        - alert: VeleroBackupFailed
+          expr: velero_backup_last_status{schedule="homelab-daily-backup"} == 0
+          for: 15m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero backup failed for schedule {{ $labels.schedule }}"
+            description: "The last run of schedule {{ $labels.schedule }} ended Failed, PartiallyFailed or FailedValidation. Check the newest backup and its PodVolumeBackups in namespace velero. (KAN-32)"
+
+        - alert: VeleroBackupStale
+          expr: (time() - velero_backup_last_successful_timestamp{schedule="homelab-daily-backup"}) > 36 * 3600
+          for: 1h
+          labels:
+            severity: critical
+          annotations:
+            summary: "No successful Velero backup for {{ $labels.schedule }} in 36h"
+            description: "Last successful backup was {{ $value | humanizeDuration }} ago; the schedule runs daily at 02:00 UTC. Check the velero server pod, the BackupStorageLocation and the BackupRepositories. (KAN-32)"
+
+        - alert: VeleroMetricsMissing
+          expr: absent(velero_backup_last_status{schedule="homelab-daily-backup"})
+          for: 30m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Velero metrics missing for schedule homelab-daily-backup"
+            description: "Prometheus has no velero_backup_last_status series for the schedule. The velero server is down, Alloy stopped scraping its pod annotations, or the schedule was renamed. (KAN-32)"
