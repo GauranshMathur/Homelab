@@ -368,10 +368,9 @@ Synology DS423+ (24TB Raw / ~10.9TB Usable) 1 drive fault tolerance
 <tr>
 <td valign="top" width="33%">
 
-<h3>To Do (6)</h3>
+<h3>To Do (5)</h3>
 
 - Configure Prometheus and Grafana with Alert Manager for dashboarding and alerts<br>
-- Add Prometheus alerting rule for Velero backup failures<br>
 - *arr Stack Migration (SQLite to PostgreSQL)<br>
 - Monthly new movies and shows<br>
 - CNPG cluster default/database has no backups at all — Authentik, n8n and Jellystat DBs are unrecoverable<br>
@@ -380,8 +379,9 @@ Synology DS423+ (24TB Raw / ~10.9TB Usable) 1 drive fault tolerance
 </td>
 <td valign="top" width="33%">
 
-<h3>In Progress (3)</h3>
+<h3>In Progress (4)</h3>
 
+- Add Prometheus alerting rule for Velero backup failures<br>
 - Install Jellyfin Stats<br>
 - Switch Velero to a helm install instead of velero cli<br>
 - Velero PVC data backups silently broken since 2026-02-26 — S3 lifecycle deletes Kopia repository format blob<br>
