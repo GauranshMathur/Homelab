@@ -368,28 +368,28 @@ Synology DS423+ (24TB Raw / ~10.9TB Usable) 1 drive fault tolerance
 <tr>
 <td valign="top" width="33%">
 
-<h3>To Do (5)</h3>
+<h3>To Do (6)</h3>
 
 - Configure Prometheus and Grafana with Alert Manager for dashboarding and alerts<br>
 - *arr Stack Migration (SQLite to PostgreSQL)<br>
 - Monthly new movies and shows<br>
 - CNPG cluster default/database has no backups at all — Authentik, n8n and Jellystat DBs are unrecoverable<br>
 - Move all serena/claude memories to confluence<br>
+- Fix duplicate episodes for bob burger<br>
 
 </td>
 <td valign="top" width="33%">
 
-<h3>In Progress (4)</h3>
+<h3>In Progress (3)</h3>
 
 - Add Prometheus alerting rule for Velero backup failures<br>
 - Install Jellyfin Stats<br>
 - Switch Velero to a helm install instead of velero cli<br>
-- Velero PVC data backups silently broken since 2026-02-26 — S3 lifecycle deletes Kopia repository format blob<br>
 
 </td>
 <td valign="top" width="33%">
 
-<h3>Done (48)</h3>
+<h3>Done (49)</h3>
 
 - Figure out why aws s3 is more costly<br>
 - Switch kanban to jira<br>
@@ -432,6 +432,7 @@ Synology DS423+ (24TB Raw / ~10.9TB Usable) 1 drive fault tolerance
 - Configure Jellyfin known proxies and known local networks<br>
 - Fix liveliness issues on gluetun and issues on other pods<br>
 - jellyfin crashed due to filled pvc data<br>
+- Velero PVC data backups silently broken since 2026-02-26 — S3 lifecycle deletes Kopia repository format blob<br>
 - Authentik rollout stuck 19h: worker node CPU-request saturation (velero over-reserved)<br>
 - Re-scope S3 lifecycle rule off the kopia/ prefix (root cause — blocks everything else)<br>
 - Clear 13 zombie backups stuck in Deleting phase<br>
