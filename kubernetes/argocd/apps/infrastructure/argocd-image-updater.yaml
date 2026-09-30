@@ -14,7 +14,7 @@ spec:
       helm:
         valueFiles:
           - $values/helm/argocd-image-updater/values.yaml
-    - repoURL: https://github.com/Gauransh-Homelab/Homelab.git
+    - repoURL: https://github.com/GauranshMathur/Homelab.git
       targetRevision: main
       ref: values
   destination:
