@@ -7,7 +7,7 @@ https://argocd.arkhaya.duckdns.org/api/webhook
 ```
 
 ## GitHub Setup
-1. Go to your repo: https://github.com/Gauransh-Homelab/Homelab
+1. Go to your repo: https://github.com/GauranshMathur/Homelab
 2. Settings → Webhooks → Add webhook
 3. Payload URL: `https://argocd.arkhaya.duckdns.org/api/webhook`
 4. Content type: `application/json`
