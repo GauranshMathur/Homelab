@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/Gauransh-Homelab/Homelab.git
+    repoURL: https://github.com/GauranshMathur/Homelab.git
     targetRevision: main
     path: kubernetes/jellyseerr
   destination:
