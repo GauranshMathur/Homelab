@@ -44,19 +44,20 @@ spec:
               port: 7878
             initialDelaySeconds: 30
             periodSeconds: 30
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /
               port: 7878
             initialDelaySeconds: 15
             periodSeconds: 15
+            timeoutSeconds: 5
           resources:
             requests:
               memory: "320Mi"
               cpu: "25m"
             limits:
               memory: "512Mi"
-              cpu: "100m"
 
       volumes:
         - name: radarr-config
