@@ -2,7 +2,7 @@
 CLAUDE.md filter=git-crypt diff=git-crypt
 CLAUDE.local.md filter=git-crypt diff=git-crypt
 .claude/** filter=git-crypt diff=git-crypt
-.serena/** filter=git-crypt diff=git-crypt
+docs/legacy-memories/** filter=git-crypt diff=git-crypt
 
 # Traefik sensitive routes and certificates
 helm/traefik/*route*.yaml filter=git-crypt diff=git-crypt
