@@ -186,6 +186,9 @@ grafana:
         datasource:
           - name: DS_PROMETHEUS
             value: prometheus
+      argocd:
+        gnetId: 19993
+        revision: 9
 
 # AlertManager - disabled: it never ran (KAN-78) and alerts now reach Discord through
 # the Botkube prometheus source, which polls Prometheus directly (KAN-12)

@@ -1,0 +1,20 @@
+# Scrapes Argo CD's built-in metrics ports (KAN-12). Argo CD is a manual Helm release,
+# not an Argo CD Application, so this avoids a helm upgrade of the GitOps engine: every
+# component already listens on a container port named "metrics". Pods without that port
+# (redis) are skipped. GitOps-managed via the kube-prometheus-stack Application's
+# directory.include.
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: argocd
+  namespace: monitoring
+spec:
+  namespaceSelector:
+    matchNames:
+      - argo-cd
+  selector:
+    matchLabels:
+      app.kubernetes.io/part-of: argocd
+      app.kubernetes.io/instance: argocd
+  podMetricsEndpoints:
+    - port: metrics
