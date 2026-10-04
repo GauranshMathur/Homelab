@@ -165,9 +165,10 @@ grafana:
         gnetId: 19122
         datasource: Prometheus
 
-# AlertManager - enabled for future use
+# AlertManager - disabled: it never ran (KAN-78) and alerts now reach Discord through
+# the Botkube prometheus source, which polls Prometheus directly (KAN-12)
 alertmanager:
-  enabled: true
+  enabled: false
   config:
     existingSecret: alertmanager-config
     existingSecretKey: alertmanager.yaml
@@ -280,14 +281,14 @@ kubeProxy:
 defaultRules:
   create: true
   rules:
-    alertmanager: true
+    alertmanager: false  # No Alertmanager (see above)
     etcd: false  # Disable - Talos manages etcd internally
     general: true
     k8s: true
     kubeApiserver: true
     kubeApiserverAvailability: true
     kubeApiserverError: true
-    kubeApiserverSlos: true
+    kubeApiserverSlos: false  # Burn-rate alerts are noise on a two-node homelab
     kubelet: true
     kubePrometheusGeneral: true
     kubePrometheusNodeRecording: true
@@ -311,3 +312,9 @@ defaultRules:
     etcdMembersDown: true
     KubeCPUOvercommit: true  # Normal for homelab
     KubeMemoryOvercommit: true  # Normal for homelab
+    # Botkube posts every firing alert unfiltered, so always-on and info alerts go
+    Watchdog: true
+    InfoInhibitor: true
+    PrometheusNotConnectedToAlertmanagers: true
+    CPUThrottlingHigh: true
+    TargetDown: true  # Fires permanently for the duplicate kubelet services
