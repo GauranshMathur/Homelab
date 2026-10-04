@@ -121,10 +121,6 @@ grafana:
       type: loki
       url: http://loki:3100
       isDefault: false
-    - name: AlertManager
-      type: alertmanager
-      url: http://kube-prometheus-stack-alertmanager:9093
-      access: proxy
 
   # Pre-load dashboards
   dashboardProviders:
@@ -147,6 +143,14 @@ grafana:
         updateIntervalSeconds: 30
         options:
           path: /var/lib/grafana/dashboards/talos
+      - name: 'homelab'
+        orgId: 1
+        folder: 'Homelab'
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 30
+        options:
+          path: /var/lib/grafana/dashboards/homelab
   
   dashboards:
     kubernetes:
@@ -164,6 +168,24 @@ grafana:
       talos-linux:
         gnetId: 19122
         datasource: Prometheus
+    homelab:
+      cnpg:
+        gnetId: 20417
+        revision: 4
+        datasource:
+          - name: DS_PROMETHEUS
+            value: prometheus
+          - name: DS_EXPRESSION
+            value: __expr__
+      velero:
+        gnetId: 16829
+        revision: 5
+      traefik:
+        gnetId: 17347
+        revision: 9
+        datasource:
+          - name: DS_PROMETHEUS
+            value: prometheus
 
 # AlertManager - disabled: it never ran (KAN-78) and alerts now reach Discord through
 # the Botkube prometheus source, which polls Prometheus directly (KAN-12)
