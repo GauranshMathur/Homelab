@@ -31,7 +31,11 @@ spec:
             severity: critical
           annotations:
             summary: "WAL archiving failing on {{ $labels.pod }}"
-            description: "WAL archiving on {{ $labels.namespace }}/{{ $labels.pod }} has been failing for 10m: the last failure is newer than the last success. WAL is piling up on the 30Gi data volume. Check the Barman Cloud plugin sidecar logs and S3 access."
+            description: |-
+              🔴 CRITICAL · {{ $labels.pod }} · WAL archiving failing
+              What: no WAL segment has reached S3 for 10m, every attempt fails
+              Impact: WAL piles up on the 30Gi data volume until Postgres stops
+              Do: check the Barman Cloud sidecar logs and S3 access
 
         - alert: CNPGWALArchiveStale
           expr: |
@@ -42,7 +46,11 @@ spec:
             severity: critical
           annotations:
             summary: "No WAL archived from {{ $labels.pod }} in 30m"
-            description: "{{ $labels.namespace }}/{{ $labels.pod }} last archived a WAL segment {{ $value | humanizeDuration }} ago. Segments switch every 5m, so the archiver is stuck or failing."
+            description: |-
+              🔴 CRITICAL · {{ $labels.pod }} · WAL archiving stuck
+              What: last WAL segment archived {{ $value | humanizeDuration }} ago (normal is every 5m)
+              Impact: backups are falling behind and WAL is piling up
+              Do: check the Barman Cloud sidecar logs and the archiver process
 
         - alert: CNPGVolumeFillingUp
           expr: |
@@ -55,7 +63,11 @@ spec:
             severity: critical
           annotations:
             summary: "CNPG volume {{ $labels.persistentvolumeclaim }} below 25% free"
-            description: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has {{ $value | humanizePercentage }} free. Usually WAL retained by failed archiving or an inactive replication slot. Postgres stops when it fills."
+            description: |-
+              🔴 CRITICAL · {{ $labels.persistentvolumeclaim }} · database volume filling up
+              What: only {{ $value | humanizePercentage }} of the volume is free
+              Impact: Postgres stops when the volume is full
+              Do: look for failed WAL archiving or an inactive replication slot
 
         - alert: CNPGReplicaNotStreaming
           expr: cnpg_pg_replication_in_recovery > cnpg_pg_replication_is_wal_receiver_up
@@ -64,7 +76,11 @@ spec:
             severity: critical
           annotations:
             summary: "Replica {{ $labels.pod }} is not streaming"
-            description: "Replica {{ $labels.namespace }}/{{ $labels.pod }} has had no running WAL receiver for 10m. It is falling behind the primary while CNPG may still report it Ready. Do not promote it."
+            description: |-
+              🔴 CRITICAL · {{ $labels.pod }} · replica not streaming
+              What: the replica has had no WAL receiver for 10m
+              Impact: it is going stale while CNPG may still show it Ready
+              Do: do NOT promote it; check the replica pod logs
 
         - alert: CNPGPrimaryHasNoStreamingReplica
           expr: |
@@ -75,7 +91,11 @@ spec:
             severity: critical
           annotations:
             summary: "Primary {{ $labels.pod }} has no streaming replica"
-            description: "Primary {{ $labels.namespace }}/{{ $labels.pod }} has had {{ $value }} streaming replicas for 10m (expected 1). The replica is down, unscraped or disconnected."
+            description: |-
+              🔴 CRITICAL · {{ $labels.pod }} · primary has no replica
+              What: {{ $value }} replicas streaming for 10m, expected 1
+              Impact: no failover target if the primary dies
+              Do: check the replica pod is running and connected
 
         - alert: CNPGReplicaLagging
           expr: cnpg_pg_replication_lag > 300
@@ -84,4 +104,22 @@ spec:
             severity: warning
           annotations:
             summary: "Replica {{ $labels.pod }} is lagging"
-            description: "Replica {{ $labels.namespace }}/{{ $labels.pod }} is {{ $value | humanizeDuration }} behind the primary."
+            description: |-
+              🟡 WARNING · {{ $labels.pod }} · replica lagging
+              What: {{ $value | humanizeDuration }} behind the primary
+              Impact: a failover now would lose recent writes
+              Do: check replica load and the network to the primary
+    # TEMPORARY: one always-firing sample so the new message format shows in Discord
+    - name: format-preview
+      rules:
+        - alert: AlertFormatSample
+          expr: vector(1)
+          labels:
+            severity: critical
+          annotations:
+            summary: "Sample of the new alert format"
+            description: |-
+              🔴 CRITICAL · database-3 · WAL archiving failing (SAMPLE, not real)
+              What: no WAL segment has reached S3 for 10m, every attempt fails
+              Impact: WAL piles up on the 30Gi data volume until Postgres stops
+              Do: check the Barman Cloud sidecar logs and S3 access

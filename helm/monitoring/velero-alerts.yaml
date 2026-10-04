@@ -31,7 +31,11 @@ spec:
             severity: critical
           annotations:
             summary: "Velero backup failed for schedule {{ $labels.schedule }}"
-            description: "The last run of schedule {{ $labels.schedule }} ended Failed, PartiallyFailed or FailedValidation. Check the newest backup and its PodVolumeBackups in namespace velero. (KAN-32)"
+            description: |-
+              🔴 CRITICAL · Velero · last backup failed
+              What: schedule {{ $labels.schedule }} ended Failed, PartiallyFailed or FailedValidation
+              Impact: PVC data may not be backed up
+              Do: check the newest backup and its PodVolumeBackups in namespace velero (KAN-32)
 
         - alert: VeleroBackupStale
           expr: (time() - velero_backup_last_successful_timestamp{schedule="homelab-daily-backup"}) > 36 * 3600
@@ -40,7 +44,11 @@ spec:
             severity: critical
           annotations:
             summary: "No successful Velero backup for {{ $labels.schedule }} in 36h"
-            description: "Last successful backup was {{ $value | humanizeDuration }} ago; the schedule runs daily at 02:00 UTC. Check the velero server pod, the BackupStorageLocation and the BackupRepositories. (KAN-32)"
+            description: |-
+              🔴 CRITICAL · Velero · no good backup in 36h
+              What: last successful backup of {{ $labels.schedule }} was {{ $value | humanizeDuration }} ago (runs daily 02:00 UTC)
+              Impact: restores would lose more than a day of data
+              Do: check the velero pod, the BackupStorageLocation and the BackupRepositories (KAN-32)
 
         - alert: VeleroMetricsMissing
           expr: absent(velero_backup_last_status{schedule="homelab-daily-backup"})
@@ -49,4 +57,8 @@ spec:
             severity: critical
           annotations:
             summary: "Velero metrics missing for schedule homelab-daily-backup"
-            description: "Prometheus has no velero_backup_last_status series for the schedule. The velero server is down, Alloy stopped scraping its pod annotations, or the schedule was renamed. (KAN-32)"
+            description: |-
+              🔴 CRITICAL · Velero · metrics missing
+              What: Prometheus has no backup status for schedule homelab-daily-backup
+              Impact: backup failures cannot be detected
+              Do: check the velero pod is up, Alloy is scraping it and the schedule name (KAN-32)
