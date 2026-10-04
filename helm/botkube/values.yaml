@@ -41,6 +41,17 @@ sources:
           ingress:
             backendServiceValid: true
             tlsSecretValid: true
+  # Polls Prometheus /api/v1/alerts directly (no Alertmanager). The plugin has no
+  # label/severity filter, so noise is controlled by which rules exist in Prometheus.
+  # Must also be listed in the channel bindings in the botkube-communications secret.
+  prometheus-alerts:
+    botkubeExtra/prometheus:
+      enabled: true
+      config:
+        url: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
+        alertStates:
+          - firing
+        ignoreOldAlerts: true
 
 executors:
   k8s-default-tools:
