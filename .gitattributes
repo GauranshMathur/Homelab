@@ -21,3 +21,5 @@ vault-vars.yml filter=git-crypt diff=git-crypt
 
 # Plain copies of CNPG secrets (recoverable without the sealed-secrets controller key)
 kubernetes/cnpg/*.secret.yaml filter=git-crypt diff=git-crypt
+# Plaintext secrets kept in the repo: name them <name>.secret.yaml, any directory
+*.secret.yaml filter=git-crypt diff=git-crypt
