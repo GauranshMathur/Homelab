@@ -1,0 +1,87 @@
+# CNPG alerting for cluster default/database (KAN-12). GitOps-managed via the
+# kube-prometheus-stack Application's directory.include. Delivered to Discord by the
+# Botkube prometheus source, which shows only the alert name and the description, so
+# every description carries the pod and value itself.
+#
+# Metric notes (verified against live scrapes 2026-10-04, instances database-3/4):
+# - cnpg_pg_stat_archiver_* is -1 on a replica, so archive rules are gated on
+#   cnpg_pg_replication_in_recovery == 0.
+# - cnpg_pg_replication_lag reads 0 when a replica has replayed everything it received,
+#   even if its WAL receiver is dead. That is the Jun-Oct 2026 stale-replica case, so
+#   CNPGReplicaNotStreaming and CNPGPrimaryHasNoStreamingReplica are the real guards.
+# - cnpg_collector_last_available_backup_timestamp is deprecated and does not cover
+#   plugin (Barman Cloud) backups. No backup-age rule is based on it.
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: cnpg-alerts
+  namespace: monitoring
+  labels:
+    prometheus: kube-prometheus
+spec:
+  groups:
+    - name: cnpg
+      rules:
+        - alert: CNPGWALArchiveFailing
+          expr: |
+            (cnpg_pg_stat_archiver_last_failed_time - cnpg_pg_stat_archiver_last_archived_time) > 1
+            and on(namespace, pod) cnpg_pg_replication_in_recovery == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "WAL archiving failing on {{ $labels.pod }}"
+            description: "WAL archiving on {{ $labels.namespace }}/{{ $labels.pod }} has been failing for 10m: the last failure is newer than the last success. WAL is piling up on the 30Gi data volume. Check the Barman Cloud plugin sidecar logs and S3 access."
+
+        - alert: CNPGWALArchiveStale
+          expr: |
+            cnpg_pg_stat_archiver_seconds_since_last_archival > 1800
+            and on(namespace, pod) cnpg_pg_replication_in_recovery == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "No WAL archived from {{ $labels.pod }} in 30m"
+            description: "{{ $labels.namespace }}/{{ $labels.pod }} last archived a WAL segment {{ $value | humanizeDuration }} ago. Segments switch every 5m, so the archiver is stuck or failing."
+
+        - alert: CNPGVolumeFillingUp
+          expr: |
+            max by (namespace, persistentvolumeclaim) (
+              kubelet_volume_stats_available_bytes{namespace="default", persistentvolumeclaim=~"database-.*"}
+              / kubelet_volume_stats_capacity_bytes{namespace="default", persistentvolumeclaim=~"database-.*"}
+            ) < 0.25
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "CNPG volume {{ $labels.persistentvolumeclaim }} below 25% free"
+            description: "PVC {{ $labels.namespace }}/{{ $labels.persistentvolumeclaim }} has {{ $value | humanizePercentage }} free. Usually WAL retained by failed archiving or an inactive replication slot. Postgres stops when it fills."
+
+        - alert: CNPGReplicaNotStreaming
+          expr: cnpg_pg_replication_in_recovery > cnpg_pg_replication_is_wal_receiver_up
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Replica {{ $labels.pod }} is not streaming"
+            description: "Replica {{ $labels.namespace }}/{{ $labels.pod }} has had no running WAL receiver for 10m. It is falling behind the primary while CNPG may still report it Ready. Do not promote it."
+
+        - alert: CNPGPrimaryHasNoStreamingReplica
+          expr: |
+            cnpg_pg_replication_streaming_replicas < 1
+            and on(namespace, pod) cnpg_pg_replication_in_recovery == 0
+          for: 10m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Primary {{ $labels.pod }} has no streaming replica"
+            description: "Primary {{ $labels.namespace }}/{{ $labels.pod }} has had {{ $value }} streaming replicas for 10m (expected 1). The replica is down, unscraped or disconnected."
+
+        - alert: CNPGReplicaLagging
+          expr: cnpg_pg_replication_lag > 300
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Replica {{ $labels.pod }} is lagging"
+            description: "Replica {{ $labels.namespace }}/{{ $labels.pod }} is {{ $value | humanizeDuration }} behind the primary."
