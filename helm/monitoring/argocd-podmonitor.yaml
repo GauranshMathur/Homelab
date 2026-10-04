@@ -16,5 +16,11 @@ spec:
     matchLabels:
       app.kubernetes.io/part-of: argocd
       app.kubernetes.io/instance: argocd
+    matchExpressions:
+      # Dex declares a metrics port but serves nothing on it unless dex.metrics is enabled
+      - key: app.kubernetes.io/component
+        operator: NotIn
+        values:
+          - dex-server
   podMetricsEndpoints:
     - port: metrics
