@@ -1,0 +1,27 @@
+apiVersion: barmancloud.cnpg.io/v1
+kind: ObjectStore
+metadata:
+  name: database-backup
+  namespace: default
+spec:
+  # Barman deletes its own expired backups and WAL. Do NOT add an age-based S3
+  # lifecycle rule on the cnpg/ prefix (same failure mode as kopia/, KAN-68).
+  retentionPolicy: "14d"
+  configuration:
+    # Same bucket as Velero, separate prefix. Bucket lifecycle expiry only
+    # covers backups/ and restores/.
+    destinationPath: s3://arkhaya-velero-backup/cnpg
+    s3Credentials:
+      accessKeyId:
+        name: cnpg-s3-credentials
+        key: ACCESS_KEY_ID
+      secretAccessKey:
+        name: cnpg-s3-credentials
+        key: ACCESS_SECRET_KEY
+      region:
+        name: cnpg-s3-credentials
+        key: AWS_REGION
+    wal:
+      compression: gzip
+    data:
+      compression: gzip

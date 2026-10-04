@@ -18,3 +18,6 @@ iscsi-config* filter=git-crypt diff=git-crypt
 
 # Ansible secrets
 vault-vars.yml filter=git-crypt diff=git-crypt
+
+# Plain copies of CNPG secrets (recoverable without the sealed-secrets controller key)
+kubernetes/cnpg/*.secret.yaml filter=git-crypt diff=git-crypt

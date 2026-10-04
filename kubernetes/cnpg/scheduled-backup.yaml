@@ -1,0 +1,16 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: ScheduledBackup
+metadata:
+  name: database-daily
+  namespace: default
+spec:
+  cluster:
+    name: database
+  # Six fields (seconds first). 18:00 UTC = 02:00 SGT, clear of the Velero
+  # run at 02:00 UTC.
+  schedule: "0 0 18 * * *"
+  immediate: true
+  backupOwnerReference: self
+  method: plugin
+  pluginConfiguration:
+    name: barman-cloud.cloudnative-pg.io

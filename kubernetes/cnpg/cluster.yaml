@@ -17,6 +17,15 @@ spec:
       autovacuum_analyze_scale_factor: "0.02"
       autovacuum_naptime: "30s"
 
+  # Base backups + continuous WAL archiving to S3 via the Barman Cloud plugin
+  # (objectstore.yaml). Without a WAL archive a lagging replica can never catch
+  # up and pg_rewind cannot rejoin a diverged instance (2026-10-01 incident).
+  plugins:
+    - name: barman-cloud.cloudnative-pg.io
+      isWALArchiver: true
+      parameters:
+        barmanObjectName: database-backup
+
   storage:
     size: 30Gi
     storageClass: synostorage
