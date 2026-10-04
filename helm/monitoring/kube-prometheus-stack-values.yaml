@@ -317,4 +317,3 @@ defaultRules:
     InfoInhibitor: true
     PrometheusNotConnectedToAlertmanagers: true
     CPUThrottlingHigh: true
-    TargetDown: true  # Fires permanently for the duplicate kubelet services
