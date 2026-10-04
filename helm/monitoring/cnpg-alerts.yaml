@@ -109,17 +109,3 @@ spec:
               What: {{ $value | humanizeDuration }} behind the primary
               Impact: a failover now would lose recent writes
               Do: check replica load and the network to the primary
-    # TEMPORARY: one always-firing sample so the new message format shows in Discord
-    - name: format-preview
-      rules:
-        - alert: AlertFormatSample
-          expr: vector(1)
-          labels:
-            severity: critical
-          annotations:
-            summary: "Sample of the new alert format"
-            description: |-
-              🔴 CRITICAL · database-3 · WAL archiving failing (SAMPLE, not real)
-              What: no WAL segment has reached S3 for 10m, every attempt fails
-              Impact: WAL piles up on the 30Gi data volume until Postgres stops
-              Do: check the Barman Cloud sidecar logs and S3 access
