@@ -51,7 +51,7 @@ sources:
         url: http://kube-prometheus-stack-prometheus.monitoring.svc:9090
         alertStates:
           - firing
-        ignoreOldAlerts: false
+        ignoreOldAlerts: true
 
 executors:
   k8s-default-tools:
