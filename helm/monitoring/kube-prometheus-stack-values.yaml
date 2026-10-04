@@ -272,6 +272,7 @@ kubelet:
     cAdvisor: true
     probes: true
     resource: true
+    resourcePath: "/metrics/resource"  # chart default is the removed v1alpha1 path
 
 # DISABLE: Talos uses cilium, not kube-proxy
 kubeProxy:
