@@ -13,6 +13,8 @@ configs:
     timeout.reconciliation: "180s"
     # Local account for CLI automation - apiKey only (no UI login), token stored locally
     accounts.claude: "apiKey"
+    # Set by hand on the live cluster before this file was ever applied; kept so an upgrade cannot drop it
+    accounts.admin: "apiKey, login"
   rbac:
     policy.csv: |
       p, claude, applications, get, */*, allow
@@ -23,6 +25,9 @@ configs:
 # memory limits with headroom, and no CPU limits (they caused throttling on other apps
 # here). The worker node is short on unreserved CPU, so keep CPU requests small.
 server:
+  # Part of the original install; redundant with configs.params server.insecure but kept for parity
+  extraArgs:
+    - --insecure
   resources:
     requests:
       cpu: 10m
