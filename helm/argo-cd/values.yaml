@@ -19,40 +19,39 @@ configs:
       p, claude, applications, sync, */*, allow
       p, claude, projects, get, *, allow
 
+# Resources sized from 7 days of real usage (2026-10-05): requests near actual use,
+# memory limits with headroom, and no CPU limits (they caused throttling on other apps
+# here). The worker node is short on unreserved CPU, so keep CPU requests small.
 server:
   resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
     requests:
-      cpu: 100m
+      cpu: 10m
       memory: 128Mi
+    limits:
+      memory: 512Mi
   ingress:
     enabled: false
 
 controller:
   resources:
-    limits:
-      cpu: 1000m
-      memory: 1Gi
     requests:
-      cpu: 250m
-      memory: 512Mi
+      cpu: 50m
+      memory: 640Mi
+    limits:
+      memory: 1536Mi
 
 repoServer:
   resources:
-    limits:
-      cpu: 500m
-      memory: 512Mi
     requests:
-      cpu: 100m
+      cpu: 20m
       memory: 128Mi
+    limits:
+      memory: 512Mi
 
 redis:
   resources:
-    limits:
-      cpu: 200m
-      memory: 256Mi
     requests:
-      cpu: 50m
-      memory: 64Mi
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      memory: 128Mi
