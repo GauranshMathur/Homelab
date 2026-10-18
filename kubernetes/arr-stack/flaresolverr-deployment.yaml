@@ -22,7 +22,7 @@ spec:
         - name: flaresolverr
           # Cloudflare-challenge solver used by Prowlarr (indexer proxy) for 1337x.
           # Drop-in alternative if this stops solving challenges: ghcr.io/thephaseless/byparr (same port/API).
-          image: ghcr.io/flaresolverr/flaresolverr:v3.5.0
+          image: ghcr.io/flaresolverr/flaresolverr:v3.5.2
           env:
             - name: LOG_LEVEL
               value: "info"
