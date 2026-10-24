@@ -36,7 +36,7 @@ spec:
           - 104 # render group for GPU access
       containers:
         - name: jellyfin
-          image: jellyfin/jellyfin:12.2
+          image: jellyfin/jellyfin:12.3
           imagePullPolicy: IfNotPresent
           resources:
             limits:
