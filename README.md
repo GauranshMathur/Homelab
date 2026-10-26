@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-1.37.0-326CE5?logo=kubernetes&logoColor=white)
-![Talos](https://img.shields.io/badge/Talos_Linux-1.14.0-FF7300?logo=linux&logoColor=white)
+![Talos](https://img.shields.io/badge/Talos_Linux-1.14.4-FF7300?logo=linux&logoColor=white)
 ![Services](https://img.shields.io/badge/Services-30+-00ADD8?logo=docker&logoColor=white)
 ![Status](https://img.shields.io/badge/Status-Operational-brightgreen?logo=statuspage&logoColor=white)
 ![Last Updated](https://img.shields.io/badge/Updated-September%202026-purple?logo=github&logoColor=white)
