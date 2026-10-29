@@ -2,7 +2,7 @@ replicas: 1
 
 image:
   repository: registry.k8s.io/metrics-server/metrics-server
-  tag: v0.9.0
+  tag: v0.9.1
   pullPolicy: IfNotPresent
 
 args:
