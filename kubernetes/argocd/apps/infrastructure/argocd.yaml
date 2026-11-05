@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argo-cd
+  # No resources-finalizer: deleting this Application must never cascade-delete ArgoCD itself
+spec:
+  project: default
+  sources:
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-cd
+      targetRevision: 10.14.0
+      helm:
+        # Must match the original manual Helm release, or the chart renders a second set of resources
+        releaseName: argocd
+        valueFiles:
+          - $values/helm/argo-cd/values.yaml
+    - repoURL: https://github.com/GauranshMathur/Homelab.git
+      targetRevision: main
+      ref: values
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo-cd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+    - CreateNamespace=false
+    - PrunePropagationPolicy=foreground
+    # Required when ArgoCD manages itself: from v3.3 the ApplicationSet CRD is too big for client-side apply
+    - ServerSideApply=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
