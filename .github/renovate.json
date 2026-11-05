@@ -77,17 +77,33 @@
       "automerge": false
     },
     {
-      "description": "Group ArgoCD updates - never auto-merge the GitOps engine itself",
+      "description": "Group ArgoCD updates - minors and majors need a manual merge; patches get their own PR so they can automerge",
       "matchDatasources": [
         "docker",
         "helm"
       ],
       "groupName": "ArgoCD",
       "automerge": false,
+      "separateMinorPatch": true,
       "matchPackageNames": [
         "/argo-cd/",
         "/argocd/"
       ]
+    },
+    {
+      "description": "ArgoCD chart patches automerge once 3 days old - a chart patch can still carry an ArgoCD minor (10.2.3 shipped v3.5.0)",
+      "matchDatasources": [
+        "helm"
+      ],
+      "matchPackageNames": [
+        "/argo-cd/",
+        "/argocd/"
+      ],
+      "matchUpdateTypes": [
+        "patch"
+      ],
+      "minimumReleaseAge": "3 days",
+      "automerge": true
     },
     {
       "description": "Cilium chart - minor upgrades need consecutive steps, pin to patch only",
