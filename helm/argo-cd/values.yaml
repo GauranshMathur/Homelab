@@ -1,6 +1,9 @@
 # ArgoCD Helm Values for Homelab
 global:
   domain: argocd.arkhaya.duckdns.org
+  # Chart 10.0.0 flips this default to true; Cilium enforces NetworkPolicy, so enabling it is its own change
+  networkPolicy:
+    create: false
 
 configs:
   params:
