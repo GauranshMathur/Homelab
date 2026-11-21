@@ -29,7 +29,7 @@ spec:
                   - key: kubernetes.io/hostname
                     operator: In
                     values:
-                      - talos-f37-jub
+                      - talos-dhh-lbp
       securityContext:
         supplementalGroups:
           - 44 # video group for GPU access
